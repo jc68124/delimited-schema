@@ -3,12 +3,7 @@
   "baseBranch": "master",
   "access": "public",
   "format": "auto",
-  "changelog": [
-    "@changesets/changelog-github",
-    {
-      "repo": "jc68124/delimited-schema"
-    }
-  ],
+  "changelog": "@changesets/cli/changelog",
   "commit": true,
   "ignore": [],
   "fixed": [],
