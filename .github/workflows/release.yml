@@ -1,0 +1,65 @@
+name: Release
+
+on:
+    push:
+        branches: [master]
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+concurrency:
+    group: release-master
+    cancel-in-progress: false
+
+jobs:
+    release:
+        name: Release
+        if: >-
+            github.ref == 'refs/heads/master' &&
+            vars.NPM_RELEASE_ENABLED == 'true'
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+
+        permissions:
+            contents: write
+            pull-requests: write
+            id-token: write
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v7
+              with:
+                  fetch-depth: 0
+                  persist-credentials: false
+
+            - name: Set up pnpm
+              uses: pnpm/action-setup@v6
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v7
+              with:
+                  node-version: 24
+                  registry-url: https://registry.npmjs.org
+                  package-manager-cache: false
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Check types
+              run: pnpm typecheck
+
+            - name: Run tests
+              run: pnpm test
+
+            - name: Build package
+              run: pnpm build
+
+            - name: Create release PR or publish
+              uses: changesets/action@v2
+              with:
+                  github-token: ${{ github.token }}
+                  version-script: pnpm exec changeset version
+                  publish-script: pnpm exec changeset publish
+                  commit-message: "chore: version package"
+                  pr-title: "chore: release package"
