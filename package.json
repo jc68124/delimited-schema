@@ -11,32 +11,34 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-      ".": {
-          "import": {
-              "types": "./dist/index.d.ts",
-              "default": "./dist/index.js"
-          },
-          "require": {
-              "types": "./dist/index.d.cts",
-              "default": "./dist/index.cjs"
-          }
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
       }
+    }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "publishConfig": {
-      "access": "public"
+    "access": "public"
   },
   "scripts": {
-      "build": "tsup",
-      "typecheck": "tsc --noEmit",
-      "test": "vitest run",
-      "test:watch": "vitest",
-      "changeset": "changeset",
-      "release": "pnpm build && changeset publish"
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "changeset": "changeset",
+    "release": "pnpm build && changeset publish"
   },
   "repository": {
-      "type": "git",
-      "url": "git+https://github.com/jc68124/delimited-schema.git"
+    "type": "git",
+    "url": "git+https://github.com/jc68124/delimited-schema.git"
   },
   "keywords": [],
   "author": "",
@@ -44,7 +46,6 @@
   "devDependencies": {
     "@changesets/cli": "^3.0.3",
     "@types/node": "^26.6.6",
-    "tsup": "^9.0.0",
     "typescript": "^7.0.2",
     "vitest": "^5.1.0"
   }
