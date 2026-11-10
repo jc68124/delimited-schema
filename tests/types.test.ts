@@ -4,10 +4,6 @@ import {
     createDelimitedTextSchema,
 } from '../src/index.js';
 
-import type {
-    ParsedDelimitedTextRow,
-} from '../src/index.js';
-
 interface Product {
     name: string;
     quantity: number;
