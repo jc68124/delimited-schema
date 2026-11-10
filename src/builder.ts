@@ -8,7 +8,21 @@ import type {
     DelimitedTextValueValidator,
 } from './types.js';
 
-export class DelimitedTextSchemaBuilder<T extends object> {
+type BuilderWithKey<
+    T extends object,
+    MappedKeys extends keyof T,
+    K extends keyof T,
+> = K extends keyof T
+    ? DelimitedTextSchemaBuilder<
+        T,
+        MappedKeys | ({} extends Record<K, string> ? never : K)
+    >
+    : never;
+
+export class DelimitedTextSchemaBuilder<
+    T extends object,
+    MappedKeys extends keyof T = never,
+> {
     private readonly columns: DelimitedTextColumnDefinition<T>[] = [];
 
     addColumn(
@@ -30,7 +44,7 @@ export class DelimitedTextSchemaBuilder<T extends object> {
     addKeyColumn<K extends keyof T>(
         key: K,
         options: DelimitedTextKeyColumnOptions<T, K> = {},
-    ): this {
+    ): BuilderWithKey<T, MappedKeys, K> {
         const column: DelimitedTextColumnDefinition<T> = {
             key,
             header: options.header ?? String(key),
@@ -69,15 +83,15 @@ export class DelimitedTextSchemaBuilder<T extends object> {
 
         this.columns.push(column);
 
-        return this;
+        return this as unknown as BuilderWithKey<T, MappedKeys, K>;
     }
 
     build<AllowPartial extends boolean = false>(
         options: DelimitedTextSchemaOptions & {
             allowPartialRows?: AllowPartial;
         },
-    ): DelimitedTextSchema<T, AllowPartial> {
-        return new DelimitedTextSchema<T, AllowPartial>(
+    ): DelimitedTextSchema<T, AllowPartial, MappedKeys> {
+        return new DelimitedTextSchema<T, AllowPartial, MappedKeys>(
             this.columns,
             options,
         );

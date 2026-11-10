@@ -6,9 +6,12 @@ export type DelimitedTextPrimitive =
     | undefined
     | Date;
 
-export type ParsedDelimitedTextRow<T extends object> = {
+export type ParsedDelimitedTextRow<
+    T extends object,
+    MappedKeys extends keyof T = never,
+> = {
     [K in keyof T]?: string;
-};
+} & Record<MappedKeys, string>;
 
 export type DelimitedTextRow<T, AllowPartial extends boolean> =
     AllowPartial extends true ? Partial<T> : T;
