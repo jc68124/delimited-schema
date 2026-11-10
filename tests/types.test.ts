@@ -4,10 +4,6 @@ import {
     createDelimitedTextSchema,
 } from '../src/index.js';
 
-import type {
-    ParsedDelimitedTextRow,
-} from '../src/index.js';
-
 interface Product {
     name: string;
     quantity: number;
@@ -52,19 +48,28 @@ describe('public TypeScript API', () => {
         ).toEqualTypeOf<string>();
     });
 
-    it('returns optional strings even when generation properties are numeric', () => {
+    it('returns required strings for mapped keys', () => {
         const schema = createDelimitedTextSchema<Product>()
             .addKeyColumn('name')
             .addKeyColumn('quantity')
             .build({ delimiter: ',' });
 
-        const rows = schema.parse('name,quantity\nWidget,10');
+        type Row = ReturnType<typeof schema.parse>[number];
 
-        expectTypeOf(rows)
-            .toEqualTypeOf<ParsedDelimitedTextRow<Product>[]>();
+        expectTypeOf<Row['name']>().toEqualTypeOf<string>();
+        expectTypeOf<Row['quantity']>().toEqualTypeOf<string>();
+    });
 
-        expectTypeOf(rows[0]?.quantity)
-            .toEqualTypeOf<string | undefined>();
+    it('keeps unmapped keys optional', () => {
+        const schema = createDelimitedTextSchema<Product>()
+            .addKeyColumn('name')
+            .addColumn('Source', () => 'test')
+            .build({ delimiter: ',' });
+
+        type Row = ReturnType<typeof schema.parse>[number];
+
+        expectTypeOf<Row['name']>().toEqualTypeOf<string>();
+        expectTypeOf<Row['quantity']>().toEqualTypeOf<string | undefined>();
     });
 });
 

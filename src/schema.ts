@@ -23,6 +23,7 @@ import type {
 export class DelimitedTextSchema<
     T extends object,
     AllowPartial extends boolean = false,
+    MappedKeys extends keyof T = never,
 > {
     private readonly columns: DelimitedTextColumnDefinition<T>[];
     private readonly options: DelimitedTextSchemaOptions;
@@ -105,7 +106,7 @@ export class DelimitedTextSchema<
         };
     }
 
-    parse(data: string): ParsedDelimitedTextRow<T>[] {
+    parse(data: string): ParsedDelimitedTextRow<T, MappedKeys>[] {
         const { rows, issues } = this.inspect(data);
 
         if (issues.length > 0) {
@@ -139,7 +140,8 @@ export class DelimitedTextSchema<
                 }
             });
 
-            return result;
+            // Validated headers and row lengths guarantee every mapped key.
+            return result as ParsedDelimitedTextRow<T, MappedKeys>;
         });
     }
 
